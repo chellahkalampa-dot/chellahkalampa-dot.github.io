@@ -190,6 +190,31 @@
       h1 { font-size: 41px; }
       .hero-actions .btn { width: 100%; }
     }
+
+    .library-block { margin-top: 28px; padding: 22px; border: 1px solid var(--line); border-radius: 18px; background: rgba(13, 28, 46, .62); }
+    .library-head { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:14px; }
+    .library-head h3 { margin:0; font-size:18px; }
+    .library-count { color:var(--muted-2); font-size:12px; }
+    .library-status { color:var(--muted-2); font-size:13px; margin: 6px 0 14px; }
+    .content-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+    .content-card { min-width:0; padding:16px; border:1px solid var(--line); border-radius:15px; background:linear-gradient(145deg,rgba(20,39,61,.92),rgba(11,25,42,.96)); }
+    .content-card-top { display:flex; align-items:flex-start; gap:13px; }
+    .content-cover { width:76px; height:76px; flex:0 0 76px; border-radius:12px; object-fit:cover; background:#152b42; border:1px solid var(--line); }
+    .content-cover-fallback { display:grid; place-items:center; color:var(--cyan); font-size:25px; }
+    .content-meta { min-width:0; flex:1; }
+    .content-type-tag { display:inline-flex; padding:3px 8px; margin-bottom:6px; border-radius:999px; border:1px solid var(--line); color:var(--muted); font-size:10px; letter-spacing:.04em; }
+    .content-title { margin:0 0 3px; font-size:16px; line-height:1.35; overflow-wrap:anywhere; }
+    .content-creator { color:var(--muted); font-size:12px; }
+    .content-description { color:var(--muted); font-size:12px; margin:12px 0 0; white-space:pre-wrap; overflow-wrap:anywhere; }
+    .content-audio { display:block; width:100%; margin-top:14px; height:42px; }
+    .content-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:13px; }
+    .content-action { display:inline-flex; align-items:center; justify-content:center; min-height:36px; padding:0 12px; border-radius:9px; border:1px solid rgba(88,213,208,.28); background:rgba(88,213,208,.08); color:var(--text); font-size:12px; font-weight:750; }
+    .content-action:hover { border-color:var(--cyan); background:rgba(88,213,208,.14); }
+    .content-file-meta { color:var(--muted-2); font-size:11px; margin-top:10px; }
+    .library-empty { padding:18px; border:1px dashed var(--line); border-radius:12px; color:var(--muted-2); font-size:13px; text-align:center; }
+    .connection-note { color:var(--muted-2); font-size:11px; margin-top:12px; }
+    @media (max-width:650px) { .content-grid { grid-template-columns:1fr; } .library-block { padding:16px; } }
+
   </style>
 </head>
 <body>
@@ -247,7 +272,7 @@
     <section class="section" id="music">
       <div class="wrap">
         <div class="section-head">
-          <div><p class="section-kicker">01 / Listen and discover</p><h2>Music Library</h2><p class="section-desc">A home for songs, audio releases and music downloads. Your published tracks will be organised here for visitors to explore.</p></div>
+          <div><p class="section-kicker">01 / Listen and discover</p><h2>Music Library</h2><p class="section-desc">A home for songs, audio releases and music downloads. Listen to published tracks, discover artists and download available releases.</p></div>
           <a class="text-link" href="#upload-plan">Upload area plan ↗</a>
         </div>
         <div class="cards searchable">
@@ -258,17 +283,22 @@
           </article>
           <article class="card music-card" data-search="audio player listen preview playback music">
             <div class="card-top"><div class="card-icon">▶</div><span class="tag">Audio</span></div>
-            <h3>Listen online</h3><p>Visitors will be able to play available tracks on the website before deciding to download them.</p>
+            <h3>Listen online</h3><p>Play published tracks directly on the website before downloading them.</p>
             <div class="card-foot"><span>Audio player</span><span class="arrow">↗</span></div>
           </article>
           <article class="card music-card" data-search="download mp3 music files songs">
             <div class="card-top"><div class="card-icon">⇩</div><span class="tag">Downloads</span></div>
-            <h3>Download songs</h3><p>Provide download links for music you own or are authorised to distribute, with clear track details.</p>
+            <h3>Download songs</h3><p>Download music you own or are authorised to distribute, with clear track details.</p>
             <div class="card-foot"><span>Music downloads</span><span class="arrow">↗</span></div>
           </article>
         </div>
         <div class="empty-state">No matching sections found. Try another search term.</div>
-        <div class="subsection" id="upload-plan"><div><h3>Your music collection will appear here</h3><p>This is the homepage structure. The private upload dashboard, audio player and file storage will be connected in a later development milestone.</p></div><span class="status">Upload system planned</span></div>
+        <div class="library-block" aria-labelledby="musicLibraryTitle">
+          <div class="library-head"><h3 id="musicLibraryTitle">Published tracks</h3><span class="library-count" id="musicCount">Loading…</span></div>
+          <div class="library-status" id="musicStatus" role="status" aria-live="polite">Connecting to the music catalogue…</div>
+          <div class="content-grid" id="musicItems"></div>
+          <div class="library-empty" id="musicEmpty" hidden>No published songs yet. Check back soon for new music.</div>
+        </div>
       </div>
     </section>
 
@@ -296,7 +326,12 @@
           </article>
         </div>
         <div class="empty-state">No matching sections found. Try another search term.</div>
-        <div class="subsection"><div><h3>Build your metallurgy library</h3><p>We can organise materials by subject, equipment, process area and document type, then add downloadable PDFs and articles.</p></div><span class="status">Learning library planned</span></div>
+        <div class="library-block" aria-labelledby="metallurgyLibraryTitle">
+          <div class="library-head"><h3 id="metallurgyLibraryTitle">Published metallurgy materials</h3><span class="library-count" id="metallurgyCount">Loading…</span></div>
+          <div class="library-status" id="metallurgyStatus" role="status" aria-live="polite">Connecting to the materials catalogue…</div>
+          <div class="content-grid" id="metallurgyItems"></div>
+          <div class="library-empty" id="metallurgyEmpty" hidden>No published metallurgy materials yet.</div>
+        </div>
       </div>
     </section>
 
@@ -324,7 +359,12 @@
           </article>
         </div>
         <div class="empty-state">No matching sections found. Try another search term.</div>
-        <div class="subsection"><div><h3>Your Kali Web Lab fits here</h3><p>The Kali-focused dashboard can become a dedicated page inside this Technology Hub, rather than the identity of the entire website.</p></div><span class="status">Dedicated page planned</span></div>
+        <div class="library-block" aria-labelledby="technologyLibraryTitle">
+          <div class="library-head"><h3 id="technologyLibraryTitle">Published technology materials</h3><span class="library-count" id="technologyCount">Loading…</span></div>
+          <div class="library-status" id="technologyStatus" role="status" aria-live="polite">Connecting to the technology catalogue…</div>
+          <div class="content-grid" id="technologyItems"></div>
+          <div class="library-empty" id="technologyEmpty" hidden>No published technology materials yet.</div>
+        </div>
       </div>
     </section>
 
@@ -340,12 +380,18 @@
           <div class="resource-tile" data-search="reference links useful websites"><span class="mini-icon">◎</span><div><strong>Useful links</strong><span>Trusted external references</span></div></div>
         </div>
         <div class="empty-state">No matching resources found. Try another search term.</div>
+        <div class="library-block" aria-labelledby="resourceLibraryTitle">
+          <div class="library-head"><h3 id="resourceLibraryTitle">Published downloads</h3><span class="library-count" id="resourceCount">Loading…</span></div>
+          <div class="library-status" id="resourceStatus" role="status" aria-live="polite">Connecting to the downloads catalogue…</div>
+          <div class="content-grid" id="resourceItems"></div>
+          <div class="library-empty" id="resourceEmpty" hidden>No published downloads yet.</div>
+        </div>
       </div>
     </section>
 
     <section class="wrap admin-panel" id="about">
-      <div class="admin-copy"><div class="admin-lock">♙</div><div><p class="section-kicker">For the site owner</p><h2>One place to manage your content.</h2><p>The next stage is a secure, private administrator area where you can sign in, upload songs and documents, add descriptions, and publish content for visitors. Uploads will be stored separately from this public homepage.</p></div></div>
-      <span class="status">Backend setup next</span>
+      <div class="admin-copy"><div class="admin-lock">♙</div><div><p class="section-kicker">For the site owner</p><h2>One place to manage your content.</h2><p>New songs, metallurgy notes, technology tutorials and downloadable resources are managed through the private administrator dashboard.</p><a class="text-link" href="./admin.html">Open administrator sign-in ↗</a></div></div>
+      <span class="status">Content managed securely</span>
     </section>
   </main>
 
@@ -356,44 +402,178 @@
     </div>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const menuToggle = document.getElementById('menuToggle');
-    const navLinks = document.getElementById('navLinks');
-    menuToggle.addEventListener('click', () => {
-      const isOpen = navLinks.classList.toggle('open');
-      menuToggle.setAttribute('aria-expanded', String(isOpen));
-      menuToggle.setAttribute('aria-label', isOpen ? 'Close navigation' : 'Open navigation');
-      menuToggle.textContent = isOpen ? '×' : '☰';
-    });
-    navLinks.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
-      navLinks.classList.remove('open');
-      menuToggle.setAttribute('aria-expanded', 'false');
-      menuToggle.setAttribute('aria-label', 'Open navigation');
-      menuToggle.textContent = '☰';
-    }));
-    document.getElementById('year').textContent = new Date().getFullYear();
+    (() => {
+      'use strict';
 
-    const searchInput = document.getElementById('hubSearch');
-    const searchableItems = [...document.querySelectorAll('[data-search]')];
-    const emptyStates = [...document.querySelectorAll('.empty-state')];
-    searchInput.addEventListener('input', () => {
-      const term = searchInput.value.trim().toLowerCase();
-      searchableItems.forEach(item => {
-        const text = (item.dataset.search + ' ' + item.textContent).toLowerCase();
-        item.hidden = term.length > 0 && !text.includes(term);
+      // Replace these two values with your Supabase Project URL and PUBLISHABLE key.
+      // A publishable key is intended for browser use; never place a secret/service_role key here.
+      const SUPABASE_URL = 'https://njlzebhvwubblcsendiz.supabase.co';
+      const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_G1lTGHb8rbZVT2hT_v7VWA_GjIxRi1m';
+      const BUCKET = 'hub-files';
+
+      const menuToggle = document.getElementById('menuToggle');
+      const navLinks = document.getElementById('navLinks');
+      menuToggle.addEventListener('click', () => {
+        const isOpen = navLinks.classList.toggle('open');
+        menuToggle.setAttribute('aria-expanded', String(isOpen));
+        menuToggle.setAttribute('aria-label', isOpen ? 'Close navigation' : 'Open navigation');
+        menuToggle.textContent = isOpen ? '×' : '☰';
       });
-      document.querySelectorAll('.cards').forEach(group => {
-        const state = group.nextElementSibling;
-        if (state && state.classList.contains('empty-state')) {
-          const visible = [...group.querySelectorAll('[data-search]')].some(item => !item.hidden);
-          state.style.display = term && !visible ? 'block' : 'none';
+      navLinks.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
+        navLinks.classList.remove('open');
+        menuToggle.setAttribute('aria-expanded', 'false');
+        menuToggle.setAttribute('aria-label', 'Open navigation');
+        menuToggle.textContent = '☰';
+      }));
+      document.getElementById('year').textContent = new Date().getFullYear();
+
+      const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, ch => ({
+        '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+      }[ch]));
+      const formatSize = bytes => {
+        const n = Number(bytes);
+        if (!Number.isFinite(n) || n <= 0) return '';
+        if (n < 1024 * 1024) return `${(n / 1024).toFixed(0)} KB`;
+        return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+      };
+      const sectionConfig = {
+        music: { plural:'music', itemId:'musicItems', statusId:'musicStatus', countId:'musicCount', emptyId:'musicEmpty', label:'Music Library', icon:'♫' },
+        metallurgy: { plural:'metallurgy', itemId:'metallurgyItems', statusId:'metallurgyStatus', countId:'metallurgyCount', emptyId:'metallurgyEmpty', label:'Metallurgy Hub', icon:'⚙' },
+        technology: { plural:'technology', itemId:'technologyItems', statusId:'technologyStatus', countId:'technologyCount', emptyId:'technologyEmpty', label:'Technology Hub', icon:'⌘' },
+        resource: { plural:'resource', itemId:'resourceItems', statusId:'resourceStatus', countId:'resourceCount', emptyId:'resourceEmpty', label:'Resources Centre', icon:'▤' }
+      };
+      const setStatus = (type, message) => {
+        const cfg = sectionConfig[type];
+        document.getElementById(cfg.statusId).textContent = message;
+      };
+      const getPublicUrl = path => {
+        const { data } = hubClient.storage.from(BUCKET).getPublicUrl(path);
+        return data?.publicUrl || '';
+      };
+      const getDownloadUrl = (path, fileName) => {
+        const { data } = hubClient.storage.from(BUCKET).getPublicUrl(path, { download: fileName || true });
+        return data?.publicUrl || getPublicUrl(path);
+      };
+      const renderItem = (item, type) => {
+        const cfg = sectionConfig[type];
+        const fileUrl = getPublicUrl(item.file_path);
+        const downloadUrl = getDownloadUrl(item.file_path, item.original_file_name);
+        const coverUrl = item.cover_path ? getPublicUrl(item.cover_path) : '';
+        const title = escapeHtml(item.title);
+        const creator = escapeHtml(item.creator || 'Digital Hub');
+        const description = item.description ? `<p class="content-description">${escapeHtml(item.description)}</p>` : '';
+        const searchText = escapeHtml([item.title, item.creator, item.description, item.original_file_name, cfg.label].filter(Boolean).join(' ').toLowerCase());
+        const cover = type === 'music'
+          ? (coverUrl
+              ? `<img class="content-cover" src="${escapeHtml(coverUrl)}" alt="Cover artwork for ${title}" loading="lazy">`
+              : `<div class="content-cover content-cover-fallback" aria-hidden="true">${cfg.icon}</div>`)
+          : `<div class="content-cover content-cover-fallback" aria-hidden="true">${cfg.icon}</div>`;
+        const audio = type === 'music'
+          ? `<audio class="content-audio" controls preload="none" src="${escapeHtml(fileUrl)}">Your browser does not support audio playback.</audio>`
+          : '';
+        const actionLabel = type === 'music' ? 'Download song ↓' : 'Download file ↓';
+        const fileMeta = [escapeHtml(item.original_file_name || ''), formatSize(item.file_size)].filter(Boolean).join(' · ');
+        return `<article class="content-card" data-search="${searchText}">
+          <div class="content-card-top">${cover}<div class="content-meta"><span class="content-type-tag">${escapeHtml(cfg.label)}</span><h4 class="content-title">${title}</h4><div class="content-creator">${creator}</div></div></div>
+          ${description}${audio}
+          <div class="content-actions"><a class="content-action" href="${escapeHtml(downloadUrl)}" rel="noopener">${actionLabel}</a>${type !== 'music' ? `<a class="content-action" href="${escapeHtml(fileUrl)}" target="_blank" rel="noopener noreferrer">Open file ↗</a>` : ''}</div>
+          ${fileMeta ? `<div class="content-file-meta">${fileMeta}</div>` : ''}
+        </article>`;
+      };
+      function applySearch() {
+        const term = document.getElementById('hubSearch').value.trim().toLowerCase();
+        document.querySelectorAll('[data-search]').forEach(item => {
+          const text = (item.getAttribute('data-search') + ' ' + item.textContent).toLowerCase();
+          item.hidden = term.length > 0 && !text.includes(term);
+        });
+        document.querySelectorAll('.cards').forEach(group => {
+          const state = group.nextElementSibling;
+          if (state && state.classList.contains('empty-state')) {
+            const visible = [...group.querySelectorAll('[data-search]')].some(item => !item.hidden);
+            state.style.display = term && !visible ? 'block' : 'none';
+          }
+        });
+        document.querySelectorAll('.content-grid').forEach(group => {
+          const state = group.nextElementSibling;
+          if (state && state.classList.contains('library-empty')) {
+            const visible = [...group.querySelectorAll('[data-search]')].some(item => !item.hidden);
+            const hasItems = group.querySelectorAll('[data-search]').length > 0;
+            if (hasItems) {
+              state.textContent = 'No matching items. Try another search term.';
+              state.hidden = !(term && !visible);
+            }
+          }
+        });
+        const resources = document.querySelector('.resource-grid');
+        const resourceState = resources.nextElementSibling;
+        const visibleResources = [...resources.querySelectorAll('[data-search]')].some(item => !item.hidden);
+        resourceState.style.display = term && !visibleResources ? 'block' : 'none';
+      }
+      document.getElementById('hubSearch').addEventListener('input', applySearch);
+
+      function setConnectionUnavailable(message) {
+        Object.keys(sectionConfig).forEach(type => {
+          setStatus(type, message);
+          const cfg = sectionConfig[type];
+          document.getElementById(cfg.countId).textContent = 'Not connected';
+          document.getElementById(cfg.emptyId).hidden = false;
+          document.getElementById(cfg.emptyId).textContent = 'The public content library is being connected. Please check back soon.';
+        });
+      }
+
+      if (!window.supabase || !window.supabase.createClient) {
+        setConnectionUnavailable('The content service could not load. Please refresh later.');
+        return;
+      }
+      if (SUPABASE_URL.startsWith('PASTE_') || SUPABASE_PUBLISHABLE_KEY.startsWith('PASTE_')) {
+        setConnectionUnavailable('The website owner still needs to add the Supabase public connection details.');
+        return;
+      }
+      if (!/^https:\/\/[a-zA-Z0-9-]+\.supabase\.co$/.test(SUPABASE_URL) || !(SUPABASE_PUBLISHABLE_KEY.startsWith('sb_publishable_') || SUPABASE_PUBLISHABLE_KEY.startsWith('eyJ'))) {
+        setConnectionUnavailable('The public library connection settings need to be checked by the website owner.');
+        return;
+      }
+
+      const hubClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+        auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+      });
+      async function loadPublicContent() {
+        const { data, error } = await hubClient
+          .from('hub_content')
+          .select('id,content_type,title,creator,description,file_path,original_file_name,mime_type,file_size,cover_path,created_at')
+          .eq('is_published', true)
+          .order('created_at', { ascending: false })
+          .limit(100);
+        if (error) {
+          console.error('Digital Hub public catalogue error:', error);
+          Object.keys(sectionConfig).forEach(type => {
+            setStatus(type, 'Published content could not be loaded right now. Please try again later.');
+            document.getElementById(sectionConfig[type].countId).textContent = 'Unavailable';
+          });
+          return;
         }
-      });
-      const resources = document.querySelector('.resource-grid');
-      const resourceState = resources.nextElementSibling;
-      const visibleResources = [...resources.querySelectorAll('[data-search]')].some(item => !item.hidden);
-      resourceState.style.display = term && !visibleResources ? 'block' : 'none';
-    });
+        Object.keys(sectionConfig).forEach(type => {
+          const cfg = sectionConfig[type];
+          const items = (data || []).filter(item => item.content_type === type);
+          const host = document.getElementById(cfg.itemId);
+          const empty = document.getElementById(cfg.emptyId);
+          host.innerHTML = items.map(item => renderItem(item, type)).join('');
+          document.getElementById(cfg.countId).textContent = `${items.length} published ${items.length === 1 ? 'item' : 'items'}`;
+          if (!items.length) {
+            setStatus(type, `There are no published items in ${cfg.label} yet.`);
+            empty.hidden = false;
+            empty.textContent = `No published items in ${cfg.label} yet. New material will appear here when it is published.`;
+          } else {
+            setStatus(type, 'Latest published items from Digital Hub.');
+            empty.hidden = true;
+          }
+        });
+        applySearch();
+      }
+      loadPublicContent();
+    })();
   </script>
 </body>
 </html>

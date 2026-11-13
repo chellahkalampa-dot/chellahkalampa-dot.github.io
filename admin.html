@@ -70,7 +70,8 @@
             <label for="title">Title</label><input id="title" maxlength="160" required placeholder="e.g. SAG Mill Operating Notes">
             <label for="creator">Artist / author / source (optional)</label><input id="creator" maxlength="120" placeholder="e.g. Artist name or author">
             <div id="albumWrap" class="hidden"><label for="album">Album / release name (optional — music only)</label><input id="album" maxlength="160" placeholder="e.g. First Light EP"><div class="filehint">This appears with the artist in the public Music Library.</div></div>
-            <div id="albumMigrationNotice" class="notice warn hidden" style="font-size:.82rem">Album details require the one-time database migration. Run <strong>ADD-ALBUM-METADATA.sql</strong> in Supabase SQL Editor, then refresh this page.</div>
+            <div id="albumMigrationNotice" class="notice warn hidden" style="font-size:.82rem">Album details require the Stage 13 music metadata migration. Run <strong>ADD-STAGE13-MUSIC-METADATA.sql</strong> in Supabase SQL Editor, then refresh this page.</div>
+            <div id="featuredWrap" class="hidden"><label class="checkline"><input id="featured" type="checkbox"> Feature this release on the public homepage</label><div class="filehint">Featured releases are highlighted in the Music Library and on the homepage.</div><div id="featuredMigrationNotice" class="notice warn hidden" style="font-size:.82rem">Featured releases require the Stage 13 music metadata migration. Run <strong>ADD-STAGE13-MUSIC-METADATA.sql</strong> in Supabase SQL Editor, then refresh this page.</div></div>
             <label for="description">Description (optional)</label><textarea id="description" maxlength="1200" placeholder="Briefly explain what visitors will find."></textarea>
             <label for="mainFile">Main file</label><input id="mainFile" type="file" required>
             <div class="filehint" id="fileHint">For Music Library, choose an audio file. For the other sections, choose a PDF or supported document.</div>
@@ -104,6 +105,7 @@
         <label for="editTitle">Title</label><input id="editTitle" maxlength="160" required>
         <label for="editCreator">Artist / author / source</label><input id="editCreator" maxlength="120" placeholder="Optional">
         <div id="editAlbumWrap" class="hidden"><label for="editAlbum">Album / release name</label><input id="editAlbum" maxlength="160" placeholder="Optional album or EP name"><div class="filehint">Music only. This appears on the public Music Library.</div></div>
+        <div id="editFeaturedWrap" class="hidden"><label class="checkline"><input id="editFeatured" type="checkbox"> Feature this release on the public homepage</label><div class="filehint">You can feature or unfeature a track without changing its publication status.</div></div>
         <label for="editDescription">Description</label><textarea id="editDescription" maxlength="1200" placeholder="Optional description"></textarea>
         <div id="editStatus" class="status" role="status" aria-live="polite"></div>
         <div class="actions"><button class="btn secondary" id="cancelEditBtn" type="button">Cancel</button><button class="btn primary" id="saveEditBtn" type="submit">Save changes</button></div>
@@ -123,6 +125,7 @@
     let content = [];
     let currentUser = null;
     let albumColumnAvailable = false;
+    let featuredColumnAvailable = false;
 
     const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
     const setStatus = (id, message, kind='') => { const el=$(id); el.textContent=message; el.className='status'+(kind ? ' '+kind : ''); };
@@ -171,7 +174,7 @@
       $('loginCard').classList.add('hidden'); $('adminArea').classList.remove('hidden'); $('signoutBtn').classList.remove('hidden');
       $('welcomeNotice').textContent='Signed in as '+(user.email || 'administrator')+'. You can now upload and manage content.';
       setStatus('loginStatus','');
-      await checkAlbumColumn();
+      await checkMusicColumns();
       await loadLibrary();
     }
 
@@ -204,13 +207,18 @@
 
     $('signoutBtn').addEventListener('click', async () => { if (client) await client.auth.signOut(); showLoggedOut(); });
 
-    async function checkAlbumColumn() {
+    async function checkMusicColumns() {
       if (!client) return;
-      const { error } = await client.from('hub_content').select('album').limit(1);
-      albumColumnAvailable = !error;
+      const [albumCheck, featuredCheck] = await Promise.all([
+        client.from('hub_content').select('album').limit(1),
+        client.from('hub_content').select('is_featured').limit(1)
+      ]);
+      albumColumnAvailable = !albumCheck.error;
+      featuredColumnAvailable = !featuredCheck.error;
       $('albumMigrationNotice').classList.toggle('hidden', albumColumnAvailable);
-      if (!albumColumnAvailable) {
-        setStatus('libraryStatus', 'Album field is not enabled yet. Run ADD-ALBUM-METADATA.sql in Supabase SQL Editor to add album details; all other content management remains available.', '');
+      $('featuredMigrationNotice').classList.toggle('hidden', featuredColumnAvailable);
+      if (!albumColumnAvailable || !featuredColumnAvailable) {
+        setStatus('libraryStatus', 'Some Stage 13 music fields are not enabled yet. Run ADD-STAGE13-MUSIC-METADATA.sql in Supabase SQL Editor, then refresh this page. Existing content management remains available.', '');
       }
     }
 
@@ -222,7 +230,8 @@
       $('mainFile').accept=expectedAccept(type);
       $('coverWrap').classList.toggle('hidden',type!=='music');
       $('albumWrap').classList.toggle('hidden',type!=='music');
-      if (type !== 'music') $('album').value='';
+      $('featuredWrap').classList.toggle('hidden',type!=='music');
+      if (type !== 'music') { $('album').value=''; $('featured').checked=false; }
       // Cover artwork only applies to Music Library. Clear any stale selection
       // when switching to another section so it cannot block document uploads.
       if (type !== 'music') $('coverFile').value='';
@@ -250,7 +259,8 @@
       if (type==='music' && !file.type.startsWith('audio/')) { setStatus('uploadStatus','Music Library accepts audio files only.','error'); return; }
       if (type!=='music' && file.type.startsWith('audio/')) { setStatus('uploadStatus','Audio files belong in Music Library.','error'); return; }
       if (type === 'music' && cover && !cover.type.startsWith('image/')) { setStatus('uploadStatus','Cover artwork must be an image.','error'); return; }
-      if (type === 'music' && album && !albumColumnAvailable) { setStatus('uploadStatus','Album details are not enabled in the database yet. Run ADD-ALBUM-METADATA.sql in Supabase SQL Editor, refresh this page, and retry.','error'); return; }
+      if (type === 'music' && album && !albumColumnAvailable) { setStatus('uploadStatus','Album details are not enabled in the database yet. Run ADD-STAGE13-MUSIC-METADATA.sql in Supabase SQL Editor, refresh this page, and retry.','error'); return; }
+      if (type === 'music' && $('featured').checked && !featuredColumnAvailable) { setStatus('uploadStatus','Featured releases are not enabled yet. Run ADD-STAGE13-MUSIC-METADATA.sql in Supabase SQL Editor, refresh this page, and retry.','error'); return; }
       $('uploadBtn').disabled=true; $('uploadBtn').textContent='Uploading…';
       setStatus('uploadStatus','Uploading to '+labelFor(type)+'…');
       let filePath=null, coverPath=null;
@@ -259,6 +269,7 @@
         if (cover && type==='music') coverPath=await uploadObject(cover,'covers');
         const row={content_type:type,title,creator:$('creator').value.trim() || null,description:$('description').value.trim() || null,file_path:filePath,original_file_name:file.name,mime_type:file.type || null,file_size:file.size,cover_path:coverPath,is_published:$('published').checked};
         if (type === 'music' && albumColumnAvailable) row.album = album || null;
+        if (type === 'music' && featuredColumnAvailable) row.is_featured = $('featured').checked;
         const {error}=await client.from('hub_content').insert(row);
         if (error) throw error;
         $('uploadForm').reset(); $('contentType').dispatchEvent(new Event('change'));
@@ -311,7 +322,8 @@
         const url=publicData?.publicUrl || '#';
         const fileDetail=escapeHtml(item.original_file_name || 'Uploaded file')+'<div class="meta">'+escapeHtml(formatFileSize(item.file_size))+' · Added '+escapeHtml(formatDate(item.created_at))+'</div>';
         const albumLine=item.content_type==='music' && item.album ? '<div class="item-desc">Album: '+escapeHtml(item.album)+'</div>' : '';
-        return '<tr><td><div class="item-title">'+escapeHtml(item.title)+'</div><div class="item-desc">'+escapeHtml(item.creator || 'No author/source specified')+'</div>'+albumLine+'<div class="item-desc">'+escapeHtml(item.description || '')+'</div><div><a href="'+escapeHtml(url)+'" target="_blank" rel="noopener">Open file ↗</a></div></td><td>'+escapeHtml(labelFor(item.content_type))+'</td><td>'+fileDetail+'</td><td><span class="pill '+(item.is_published?'live':'draft')+'">'+(item.is_published?'Published':'Unpublished')+'</span></td><td><div class="actions" style="margin:0"><button class="btn secondary small" data-action="edit" data-id="'+escapeHtml(item.id)+'">Edit details</button><button class="btn secondary small" data-action="toggle" data-id="'+escapeHtml(item.id)+'">'+(item.is_published?'Unpublish':'Publish')+'</button><button class="btn danger small" data-action="delete" data-id="'+escapeHtml(item.id)+'">Delete</button></div></td></tr>';
+        const featuredLine=item.content_type==='music' && item.is_featured ? '<div class="item-desc" style="color:#f0c879;font-weight:800">★ Featured release</div>' : '';
+        return '<tr><td><div class="item-title">'+escapeHtml(item.title)+'</div><div class="item-desc">'+escapeHtml(item.creator || 'No author/source specified')+'</div>'+albumLine+featuredLine+'<div class="item-desc">'+escapeHtml(item.description || '')+'</div><div><a href="'+escapeHtml(url)+'" target="_blank" rel="noopener">Open file ↗</a></div></td><td>'+escapeHtml(labelFor(item.content_type))+'</td><td>'+fileDetail+'</td><td><span class="pill '+(item.is_published?'live':'draft')+'">'+(item.is_published?'Published':'Unpublished')+'</span></td><td><div class="actions" style="margin:0"><button class="btn secondary small" data-action="edit" data-id="'+escapeHtml(item.id)+'">Edit details</button><button class="btn secondary small" data-action="toggle" data-id="'+escapeHtml(item.id)+'">'+(item.is_published?'Unpublish':'Publish')+'</button><button class="btn danger small" data-action="delete" data-id="'+escapeHtml(item.id)+'">Delete</button></div></td></tr>';
       }).join('')+'</tbody></table></div>';
     }
 
@@ -331,8 +343,10 @@
       $('saveEditBtn').disabled=true; $('saveEditBtn').textContent='Saving…';
       const changes={title,creator:$('editCreator').value.trim() || null,description:$('editDescription').value.trim() || null,updated_at:new Date().toISOString()};
       const album=$('editAlbum').value.trim();
-      if (item.content_type==='music' && album && !albumColumnAvailable) { $('saveEditBtn').disabled=false; $('saveEditBtn').textContent='Save changes'; setStatus('editStatus','Album details require the ADD-ALBUM-METADATA.sql migration in Supabase SQL Editor.','error'); return; }
+      if (item.content_type==='music' && album && !albumColumnAvailable) { $('saveEditBtn').disabled=false; $('saveEditBtn').textContent='Save changes'; setStatus('editStatus','Album details require the ADD-STAGE13-MUSIC-METADATA.sql migration in Supabase SQL Editor.','error'); return; }
+      if (item.content_type==='music' && $('editFeatured').checked && !featuredColumnAvailable) { $('saveEditBtn').disabled=false; $('saveEditBtn').textContent='Save changes'; setStatus('editStatus','Featured releases require the ADD-STAGE13-MUSIC-METADATA.sql migration in Supabase SQL Editor.','error'); return; }
       if (item.content_type==='music' && albumColumnAvailable) changes.album=album || null;
+      if (item.content_type==='music' && featuredColumnAvailable) changes.is_featured=$('editFeatured').checked;
       const {error}=await client.from('hub_content').update(changes).eq('id',id);
       $('saveEditBtn').disabled=false; $('saveEditBtn').textContent='Save changes';
       if(error){setStatus('editStatus','Could not save changes: '+error.message,'error');return;}
@@ -349,6 +363,8 @@
         $('editCreator').value=item.creator || '';
         $('editAlbum').value=item.album || '';
         $('editAlbumWrap').classList.toggle('hidden',item.content_type!=='music');
+        $('editFeatured').checked=Boolean(item.is_featured);
+        $('editFeaturedWrap').classList.toggle('hidden',item.content_type!=='music');
         $('editDescription').value=item.description || '';
         setStatus('editStatus','');
         $('editDialog').showModal();

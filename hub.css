@@ -151,3 +151,34 @@
   .page-hero-actions .btn,.page-hero-actions .play-all-button{width:100%}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation:none!important}}
+
+/* Stage 13 — artist, album and featured-release discovery */
+.featured-release-grid,.discover-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.featured-release{display:flex;gap:14px;align-items:center;min-width:0;padding:15px;border:1px solid rgba(240,200,121,.25);border-radius:17px;background:linear-gradient(145deg,rgba(41,43,51,.9),rgba(15,29,46,.96))}
+.featured-release .cover{width:86px;height:86px;flex:0 0 86px}
+.featured-release-copy{min-width:0;flex:1}
+.featured-release-copy h3{margin:7px 0 3px;font-size:15px;overflow-wrap:anywhere}
+.featured-release-copy p{margin:0;color:var(--muted);font-size:11px;overflow-wrap:anywhere}
+.featured-release-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.featured-badge{display:inline-flex;width:max-content;padding:4px 8px;border-radius:999px;border:1px solid rgba(240,200,121,.4);background:rgba(240,200,121,.09);color:#f3d795;font-size:9px;font-weight:900;letter-spacing:.06em;text-transform:uppercase}
+.music-links{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.music-links a{color:var(--cyan);font-size:10px;font-weight:800}
+.music-links a:hover{text-decoration:underline}
+.discover-card{display:flex;align-items:center;gap:14px;min-width:0;padding:14px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(145deg,rgba(20,39,61,.94),rgba(11,25,42,.97));transition:transform .18s,border-color .18s}
+.discover-card:hover{transform:translateY(-2px);border-color:rgba(88,213,208,.42)}
+.discover-cover{display:block;width:78px;height:78px;flex:0 0 78px;object-fit:cover;border-radius:13px;border:1px solid var(--line);background:#152b42}
+.discover-fallback{display:grid;place-items:center;color:var(--cyan);font-size:28px}
+.discover-copy{min-width:0;flex:1}
+.eyebrow-small{color:var(--muted2);font-size:9px;font-weight:850;letter-spacing:.1em;text-transform:uppercase}
+.discover-copy h3{margin:4px 0;font-size:15px;overflow-wrap:anywhere}
+.discover-copy p{margin:0;color:var(--muted);font-size:11px;overflow-wrap:anywhere}
+.discover-link{display:inline-block;margin-top:8px;color:var(--cyan);font-size:10px;font-weight:850}
+.section-tight{padding-top:38px;padding-bottom:0}
+.album-profile-hero{display:grid;grid-template-columns:210px minmax(0,1fr);gap:28px;align-items:center}
+.album-profile-art{width:210px;aspect-ratio:1;border-radius:22px;border:1px solid var(--line);overflow:hidden;background:linear-gradient(145deg,#17314c,#0c1b2d);box-shadow:var(--shadow)}
+.album-profile-art img{width:100%;height:100%;object-fit:cover}
+.album-profile-fallback{width:100%;height:100%;display:grid;place-items:center;color:var(--cyan);font-size:72px}
+.album-profile-copy .page-lead a{color:var(--cyan);font-weight:800}
+.featured-release .cover-fallback{display:grid;place-items:center}
+@media(max-width:950px){.featured-release-grid,.discover-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.featured-release-grid,.discover-grid{grid-template-columns:1fr}.featured-release{align-items:flex-start}.album-profile-hero{grid-template-columns:1fr;gap:18px}.album-profile-art{width:min(210px,62vw)}.section-tight{padding-top:30px}}

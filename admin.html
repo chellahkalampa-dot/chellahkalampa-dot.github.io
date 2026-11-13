@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b192a">
+  <title>Digital Hub | Admin</title>
+  <style>
+    :root{--bg:#071321;--panel:#102238;--panel2:#132b43;--line:#29445d;--text:#eef5fb;--muted:#a8bbcc;--teal:#58d5d0;--blue:#77aaff;--gold:#f0c879;--red:#ff8d8d;--green:#83dfb0;--shadow:0 18px 50px rgba(0,0,0,.22)}
+    *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 12% 0%,#173858 0,transparent 30%),var(--bg);color:var(--text);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    a{color:var(--teal);text-decoration:none} a:hover{text-decoration:underline} button,input,select,textarea{font:inherit} button{cursor:pointer}
+    .wrap{max-width:1180px;margin:auto;padding:28px 20px 60px}.top{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:28px}.brand{font-weight:850;letter-spacing:.09em;font-size:1rem}.brand span{color:var(--teal)}.eyebrow{color:var(--teal);font-size:.76rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase}.muted{color:var(--muted)}
+    h1{font-size:clamp(2rem,5vw,3.35rem);line-height:1.06;margin:7px 0 10px;letter-spacing:-.04em}h2{font-size:1.22rem;margin:0 0 5px}h3{font-size:1rem;margin:0 0 8px}.intro{max-width:700px;color:var(--muted);margin:0 0 26px}
+    .card{background:linear-gradient(145deg,rgba(19,43,67,.97),rgba(13,32,51,.98));border:1px solid var(--line);border-radius:18px;padding:21px;box-shadow:var(--shadow)}.grid{display:grid;grid-template-columns:1fr 1.3fr;gap:18px;align-items:start}.stack{display:grid;gap:18px}.row{display:flex;align-items:center;justify-content:space-between;gap:12px}.hidden{display:none!important}
+    label{display:block;color:#d7e5f1;font-size:.87rem;font-weight:650;margin:13px 0 6px}input,select,textarea{width:100%;border:1px solid #39546d;background:#081827;color:var(--text);padding:11px 12px;border-radius:10px;outline:none}input:focus,select:focus,textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(88,213,208,.12)}input[type=file]{padding:9px;background:#0a1c2d}input[type=checkbox]{width:auto;accent-color:var(--teal);margin-right:8px}textarea{min-height:88px;resize:vertical}
+    .btn{border:1px solid transparent;border-radius:10px;padding:10px 15px;font-weight:750;transition:.15s}.primary{background:var(--teal);color:#06202a}.secondary{background:#18334c;color:var(--text);border-color:#38556e}.danger{background:#48242b;color:#ffd5d5;border-color:#70414a}.small{font-size:.82rem;padding:7px 10px}.btn:disabled{opacity:.5;cursor:not-allowed}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+    .notice{padding:12px 14px;border-radius:11px;margin:12px 0;border:1px solid var(--line);background:#0a1a2a;color:var(--muted);font-size:.9rem}.notice.warn{border-color:#806c3d;background:#2a2518;color:#f8e7b9}.notice.success{border-color:#34795f;background:#102a25;color:#b9f3d4}.notice.error{border-color:#80444a;background:#301c22;color:#ffc5c5}.status{font-size:.84rem;color:var(--muted);min-height:1.3em;margin-top:9px}.pill{display:inline-flex;padding:4px 9px;border:1px solid #3a5870;border-radius:999px;color:#cde0ef;font-size:.76rem}.pill.live{color:#aaf0cf;border-color:#34795f}.pill.draft{color:#f6dfa0;border-color:#806c3d}
+    .filehint{font-size:.8rem;color:var(--muted);margin-top:5px}.checkline{display:flex;align-items:center;margin-top:13px;color:#d7e5f1;font-size:.88rem}.tablewrap{overflow:auto;margin-top:14px}table{width:100%;border-collapse:collapse;min-width:650px}th,td{text-align:left;padding:11px 9px;border-bottom:1px solid #29445d;vertical-align:top}th{color:#9eb5c9;font-size:.76rem;text-transform:uppercase;letter-spacing:.08em}td{font-size:.88rem}.item-title{font-weight:750}.item-desc{color:var(--muted);font-size:.8rem;max-width:360px}.empty{padding:24px;text-align:center;color:var(--muted);border:1px dashed #39546d;border-radius:12px;margin-top:12px}.configline{display:grid;grid-template-columns:1fr 1fr;gap:10px}.filters{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:9px;margin-top:12px}.meta{color:var(--muted);font-size:.76rem;margin-top:4px}.dialog{width:min(620px,calc(100% - 28px));border:1px solid var(--line);border-radius:18px;background:#102238;color:var(--text);padding:22px;box-shadow:var(--shadow)}.dialog::backdrop{background:rgba(0,0,0,.72)}.dialog h2{margin:0 0 4px}.dialog .actions{justify-content:flex-end}.foot{margin-top:26px;text-align:center;color:#7890a5;font-size:.8rem}
+    @media(max-width:850px){.grid{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}.configline,.filters{grid-template-columns:1fr}.wrap{padding:20px 14px 42px}.card{padding:17px}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header class="top">
+      <div class="brand">DIGITAL<span>HUB</span> <span style="color:#9db1c4;font-weight:600;letter-spacing:0"> / ADMIN</span></div>
+      <div class="row" style="justify-content:flex-start;flex-wrap:wrap">
+        <a href="./">← View public website</a>
+        <button id="signoutBtn" class="btn secondary small hidden" type="button">Sign out</button>
+      </div>
+    </header>
+
+    <div class="eyebrow">Content management</div>
+    <h1>Your private control room.</h1>
+    <p class="intro">Sign in to add music, metallurgy materials, technology tutorials and other downloadable resources to Digital Hub.</p>
+
+    <section class="card" id="configCard">
+      <div class="row"><div><h2>1. Connect your Supabase project</h2><div class="muted" style="font-size:.86rem">This connects the dashboard to your database and file storage.</div></div><span class="pill">One-time setup per browser</span></div>
+      <div class="configline">
+        <div><label for="projectUrl">Project URL</label><input id="projectUrl" type="url" placeholder="https://your-project-ref.supabase.co" autocomplete="url"></div>
+        <div><label for="publicKey">Publishable key / anon public key</label><input id="publicKey" type="password" placeholder="Paste your publishable or anon key" autocomplete="off"></div>
+      </div>
+      <div class="notice warn"><strong>Security:</strong> Use only the Supabase <em>publishable</em> key (or legacy <em>anon</em> key) here. Never paste a <strong>secret</strong>, <strong>service_role</strong>, database password or personal access token into this page. The publishable key is designed for browser use; database and Storage RLS policies must protect the data.</div>
+      <div class="actions"><button class="btn primary" id="saveConfigBtn" type="button">Save connection</button><button class="btn secondary" id="clearConfigBtn" type="button">Clear saved connection</button></div>
+      <div class="status" id="configStatus" role="status" aria-live="polite"></div>
+    </section>
+
+    <section class="card hidden" id="loginCard" style="margin-top:18px">
+      <h2>2. Administrator sign-in</h2><p class="muted" style="font-size:.87rem;margin-top:4px">Use the email and password for the administrator account you create in Supabase. There is no public sign-up form.</p>
+      <form id="loginForm">
+        <label for="email">Administrator email</label><input id="email" type="email" required autocomplete="username" placeholder="you@example.com">
+        <label for="password">Password</label><input id="password" type="password" required autocomplete="current-password" placeholder="Your password">
+        <div class="actions"><button class="btn primary" id="loginBtn" type="submit">Sign in</button></div>
+      </form>
+      <div class="status" id="loginStatus" role="status" aria-live="polite"></div>
+    </section>
+
+    <section class="hidden" id="adminArea" style="margin-top:18px">
+      <div class="notice success" id="welcomeNotice">You are signed in.</div>
+      <div class="grid">
+        <section class="card">
+          <div class="eyebrow">New content</div><h2>Upload to Digital Hub</h2><p class="muted" style="font-size:.86rem">Choose a section, add the details and select the file to publish.</p>
+          <form id="uploadForm" novalidate>
+            <label for="contentType">Website section</label>
+            <select id="contentType" required>
+              <option value="music">Music Library</option>
+              <option value="metallurgy">Metallurgy Hub</option>
+              <option value="technology">Technology Hub</option>
+              <option value="resource">Resources Centre</option>
+            </select>
+            <label for="title">Title</label><input id="title" maxlength="160" required placeholder="e.g. SAG Mill Operating Notes">
+            <label for="creator">Artist / author / source (optional)</label><input id="creator" maxlength="120" placeholder="e.g. Artist name or author">
+            <div id="albumWrap" class="hidden"><label for="album">Album / release name (optional — music only)</label><input id="album" maxlength="160" placeholder="e.g. First Light EP"><div class="filehint">This appears with the artist in the public Music Library.</div></div>
+            <div id="albumMigrationNotice" class="notice warn hidden" style="font-size:.82rem">Album details require the one-time database migration. Run <strong>ADD-ALBUM-METADATA.sql</strong> in Supabase SQL Editor, then refresh this page.</div>
+            <label for="description">Description (optional)</label><textarea id="description" maxlength="1200" placeholder="Briefly explain what visitors will find."></textarea>
+            <label for="mainFile">Main file</label><input id="mainFile" type="file" required>
+            <div class="filehint" id="fileHint">For Music Library, choose an audio file. For the other sections, choose a PDF or supported document.</div>
+            <div id="coverWrap"><label for="coverFile">Cover artwork (optional — music only)</label><input id="coverFile" type="file" accept="image/png,image/jpeg,image/webp"><div class="filehint">Use artwork you own or are licensed to use.</div></div>
+            <label class="checkline"><input id="published" type="checkbox" checked> Publish this item in the public library</label>
+            <div class="notice warn" style="font-size:.82rem">Files go into a <strong>public</strong> storage bucket so visitors can download them. Anyone who has a file URL can access that file, even if its database listing is marked as a draft. Upload only material you intend to make public.</div>
+            <div class="actions"><button id="uploadBtn" class="btn primary" type="submit">Upload content</button></div>
+            <div class="status" id="uploadStatus" role="status" aria-live="polite"></div>
+          </form>
+        </section>
+
+        <section class="card">
+          <div class="row"><div><div class="eyebrow">Content library</div><h2>Manage uploaded items</h2><div class="muted" style="font-size:.86rem">Edit item details, search and filter your library, publish, unpublish or permanently delete.</div></div><button id="refreshBtn" class="btn secondary small" type="button">Refresh</button></div>
+          <div class="filters">
+            <div><label for="filterInput">Search your library</label><input id="filterInput" type="search" placeholder="Search title, author, description or filename…"></div>
+            <div><label for="categoryFilter">Section</label><select id="categoryFilter"><option value="all">All sections</option><option value="music">Music Library</option><option value="metallurgy">Metallurgy Hub</option><option value="technology">Technology Hub</option><option value="resource">Resources Centre</option></select></div>
+            <div><label for="statusFilter">Publication status</label><select id="statusFilter"><option value="all">All statuses</option><option value="published">Published</option><option value="draft">Unpublished</option></select></div>
+          </div>
+          <div id="libraryStatus" class="status" role="status" aria-live="polite"></div>
+          <div id="libraryList"></div>
+        </section>
+      </div>
+    </section>
+
+    <dialog class="dialog" id="editDialog" aria-labelledby="editDialogTitle">
+      <form id="editForm">
+        <div class="eyebrow">Edit catalogue details</div>
+        <h2 id="editDialogTitle">Update content information</h2>
+        <p class="muted" style="font-size:.86rem;margin:4px 0 12px">Changes apply to the public listing. The uploaded file itself will not be replaced.</p>
+        <input type="hidden" id="editId">
+        <label for="editTitle">Title</label><input id="editTitle" maxlength="160" required>
+        <label for="editCreator">Artist / author / source</label><input id="editCreator" maxlength="120" placeholder="Optional">
+        <div id="editAlbumWrap" class="hidden"><label for="editAlbum">Album / release name</label><input id="editAlbum" maxlength="160" placeholder="Optional album or EP name"><div class="filehint">Music only. This appears on the public Music Library.</div></div>
+        <label for="editDescription">Description</label><textarea id="editDescription" maxlength="1200" placeholder="Optional description"></textarea>
+        <div id="editStatus" class="status" role="status" aria-live="polite"></div>
+        <div class="actions"><button class="btn secondary" id="cancelEditBtn" type="button">Cancel</button><button class="btn primary" id="saveEditBtn" type="submit">Save changes</button></div>
+      </form>
+    </dialog>
+    <footer class="foot">Digital Hub Admin • Keep your administrator password private. Public website visitors cannot upload through this dashboard.</footer>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+  (() => {
+    'use strict';
+    const BUCKET = 'hub-files';
+    const CONFIG_KEY = 'digitalHubSupabaseConfig';
+    const $ = (id) => document.getElementById(id);
+    let client = null;
+    let content = [];
+    let currentUser = null;
+    let albumColumnAvailable = false;
+
+    const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    const setStatus = (id, message, kind='') => { const el=$(id); el.textContent=message; el.className='status'+(kind ? ' '+kind : ''); };
+    const labelFor = (type) => ({music:'Music Library',metallurgy:'Metallurgy Hub',technology:'Technology Hub',resource:'Resources Centre'}[type] || type);
+    const fileNameSafe = (name) => name.normalize('NFKD').replace(/[^a-zA-Z0-9._-]+/g,'-').replace(/^-+|-+$/g,'').slice(-100) || 'upload';
+    const loadConfig = () => { try { return JSON.parse(localStorage.getItem(CONFIG_KEY) || 'null'); } catch { return null; } };
+
+    function connect() {
+      const config = loadConfig();
+      if (!config || !config.url || !config.key) return false;
+      if (!window.supabase || !window.supabase.createClient) { setStatus('configStatus','Supabase library could not load. Check your internet connection and reload.','error'); return false; }
+      try { client = window.supabase.createClient(config.url, config.key); }
+      catch (err) { setStatus('configStatus','Could not connect: '+err.message,'error'); return false; }
+      $('loginCard').classList.remove('hidden');
+      setStatus('configStatus','Project connection saved in this browser. Sign in below.','success');
+      client.auth.getSession().then(({data,error}) => {
+        if (error) { setStatus('loginStatus',error.message,'error'); return; }
+        if (data.session) verifyAdmin(data.session.user);
+      });
+      client.auth.onAuthStateChange((event) => {
+        if (event === 'SIGNED_OUT') showLoggedOut();
+      });
+      return true;
+    }
+
+    function showLoggedOut() {
+      currentUser=null;
+      $('adminArea').classList.add('hidden'); $('signoutBtn').classList.add('hidden');
+      $('loginCard').classList.remove('hidden');
+    }
+
+    async function verifyAdmin(user) {
+      currentUser=user;
+      setStatus('loginStatus','Checking administrator permissions…');
+      const {data,error}=await client.rpc('is_hub_admin');
+      if (error) {
+        await client.auth.signOut();
+        setStatus('loginStatus','Signed in, but administrator verification failed. Confirm that you ran the setup SQL and registered your account in private.hub_admins. Details: '+error.message,'error');
+        return;
+      }
+      if (data !== true) {
+        await client.auth.signOut();
+        setStatus('loginStatus','This account is not registered as a Digital Hub administrator. Add its user ID to private.hub_admins using the setup guide, then sign in again.','error');
+        return;
+      }
+      $('loginCard').classList.add('hidden'); $('adminArea').classList.remove('hidden'); $('signoutBtn').classList.remove('hidden');
+      $('welcomeNotice').textContent='Signed in as '+(user.email || 'administrator')+'. You can now upload and manage content.';
+      setStatus('loginStatus','');
+      await checkAlbumColumn();
+      await loadLibrary();
+    }
+
+    $('saveConfigBtn').addEventListener('click', () => {
+      const url=$('projectUrl').value.trim().replace(/\/$/, '');
+      const key=$('publicKey').value.trim();
+      if (!/^https:\/\/[a-zA-Z0-9-]+\.supabase\.co$/.test(url)) { setStatus('configStatus','Enter your project URL in the form https://your-project-ref.supabase.co','error'); return; }
+      if (!key || key.length < 20) { setStatus('configStatus','Paste the publishable key or legacy anon public key. Do not use a secret/service_role key.','error'); return; }
+      localStorage.setItem(CONFIG_KEY, JSON.stringify({url,key}));
+      $('loginCard').classList.add('hidden');
+      setStatus('configStatus','Connection details saved. Initialising…');
+      if (connect()) setStatus('configStatus','Project connection saved in this browser. Sign in below.','success');
+    });
+
+    $('clearConfigBtn').addEventListener('click', async () => {
+      if (client) { try { await client.auth.signOut(); } catch {} }
+      localStorage.removeItem(CONFIG_KEY); client=null; showLoggedOut(); $('loginCard').classList.add('hidden');
+      $('projectUrl').value=''; $('publicKey').value=''; setStatus('configStatus','Saved connection cleared.');
+    });
+
+    $('loginForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!client) { setStatus('loginStatus','Connect your Supabase project first.','error'); return; }
+      $('loginBtn').disabled=true; $('loginBtn').textContent='Signing in…'; setStatus('loginStatus','');
+      const {data,error}=await client.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
+      $('loginBtn').disabled=false; $('loginBtn').textContent='Sign in';
+      if (error) { setStatus('loginStatus',error.message,'error'); return; }
+      await verifyAdmin(data.user);
+    });
+
+    $('signoutBtn').addEventListener('click', async () => { if (client) await client.auth.signOut(); showLoggedOut(); });
+
+    async function checkAlbumColumn() {
+      if (!client) return;
+      const { error } = await client.from('hub_content').select('album').limit(1);
+      albumColumnAvailable = !error;
+      $('albumMigrationNotice').classList.toggle('hidden', albumColumnAvailable);
+      if (!albumColumnAvailable) {
+        setStatus('libraryStatus', 'Album field is not enabled yet. Run ADD-ALBUM-METADATA.sql in Supabase SQL Editor to add album details; all other content management remains available.', '');
+      }
+    }
+
+    function expectedAccept(type) {
+      return type === 'music' ? 'audio/*,.mp3,.m4a,.aac,.wav,.ogg,.flac' : '.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.csv,.md,image/png,image/jpeg,image/webp';
+    }
+    $('contentType').addEventListener('change', () => {
+      const type=$('contentType').value;
+      $('mainFile').accept=expectedAccept(type);
+      $('coverWrap').classList.toggle('hidden',type!=='music');
+      $('albumWrap').classList.toggle('hidden',type!=='music');
+      if (type !== 'music') $('album').value='';
+      // Cover artwork only applies to Music Library. Clear any stale selection
+      // when switching to another section so it cannot block document uploads.
+      if (type !== 'music') $('coverFile').value='';
+      $('fileHint').textContent=type==='music' ? 'Choose an audio file such as MP3, M4A, WAV, OGG or FLAC.' : 'Choose a PDF, Office document, text file or image relevant to this section.';
+    });
+
+    async function uploadObject(file, folder) {
+      const path=folder+'/'+Date.now()+'-'+crypto.randomUUID()+'-'+fileNameSafe(file.name);
+      const {data,error}=await client.storage.from(BUCKET).upload(path,file,{cacheControl:'3600',upsert:false,contentType:file.type || 'application/octet-stream'});
+      if (error) throw error;
+      return data.path;
+    }
+
+    $('uploadForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!client || !currentUser) { setStatus('uploadStatus','Sign in as an administrator first.','error'); return; }
+      const type=$('contentType').value, title=$('title').value.trim(), file=$('mainFile').files[0];
+      // Do not read or validate the hidden artwork input for non-music sections.
+      const cover = type === 'music' ? $('coverFile').files[0] : null;
+      const album = type === 'music' ? $('album').value.trim() : '';
+      // Use explicit messages instead of browser-native required-field popups.
+      if (!title) { setStatus('uploadStatus','Please enter a title for this resource.','error'); $('title').focus(); return; }
+      if (!file) { setStatus('uploadStatus','Please choose the main file to upload.','error'); $('mainFile').focus(); return; }
+      if (!['music','metallurgy','technology','resource'].includes(type)) { setStatus('uploadStatus','Please select a valid website section.','error'); $('contentType').focus(); return; }
+      if (type==='music' && !file.type.startsWith('audio/')) { setStatus('uploadStatus','Music Library accepts audio files only.','error'); return; }
+      if (type!=='music' && file.type.startsWith('audio/')) { setStatus('uploadStatus','Audio files belong in Music Library.','error'); return; }
+      if (type === 'music' && cover && !cover.type.startsWith('image/')) { setStatus('uploadStatus','Cover artwork must be an image.','error'); return; }
+      if (type === 'music' && album && !albumColumnAvailable) { setStatus('uploadStatus','Album details are not enabled in the database yet. Run ADD-ALBUM-METADATA.sql in Supabase SQL Editor, refresh this page, and retry.','error'); return; }
+      $('uploadBtn').disabled=true; $('uploadBtn').textContent='Uploading…';
+      setStatus('uploadStatus','Uploading to '+labelFor(type)+'…');
+      let filePath=null, coverPath=null;
+      try {
+        filePath=await uploadObject(file,type);
+        if (cover && type==='music') coverPath=await uploadObject(cover,'covers');
+        const row={content_type:type,title,creator:$('creator').value.trim() || null,description:$('description').value.trim() || null,file_path:filePath,original_file_name:file.name,mime_type:file.type || null,file_size:file.size,cover_path:coverPath,is_published:$('published').checked};
+        if (type === 'music' && albumColumnAvailable) row.album = album || null;
+        const {error}=await client.from('hub_content').insert(row);
+        if (error) throw error;
+        $('uploadForm').reset(); $('contentType').dispatchEvent(new Event('change'));
+        setStatus('uploadStatus','Upload complete. The item has been added to '+labelFor(type)+'.','success');
+        await loadLibrary();
+      } catch (error) {
+        const paths=[filePath,coverPath].filter(Boolean);
+        if (paths.length) { try { await client.storage.from(BUCKET).remove(paths); } catch {} }
+        setStatus('uploadStatus','Upload failed: '+(error && error.message ? error.message : String(error)),'error');
+      } finally { $('uploadBtn').disabled=false; $('uploadBtn').textContent='Upload content'; }
+    });
+
+    async function loadLibrary() {
+      if (!client) return;
+      setStatus('libraryStatus','Loading content…');
+      const {data,error}=await client.from('hub_content').select('*').order('created_at',{ascending:false}).limit(200);
+      if (error) { setStatus('libraryStatus','Could not load items: '+error.message,'error'); return; }
+      content=data || []; renderLibrary(); setStatus('libraryStatus',content.length+' item(s) loaded.');
+    }
+
+    function formatFileSize(bytes) {
+      const n=Number(bytes || 0);
+      if (!n) return 'Size unavailable';
+      if (n < 1024) return n+' B';
+      if (n < 1024*1024) return (n/1024).toFixed(1)+' KB';
+      return (n/(1024*1024)).toFixed(2)+' MB';
+    }
+
+    function formatDate(value) {
+      if (!value) return 'Date unavailable';
+      const date=new Date(value);
+      return Number.isNaN(date.getTime()) ? 'Date unavailable' : date.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'});
+    }
+
+    function renderLibrary() {
+      const q=$('filterInput').value.trim().toLowerCase();
+      const category=$('categoryFilter').value;
+      const status=$('statusFilter').value;
+      const filtered=content.filter(item => {
+        const text=[item.title,item.creator,item.album,item.description,item.content_type,item.original_file_name].join(' ').toLowerCase();
+        const matchesText=!q || text.includes(q);
+        const matchesCategory=category==='all' || item.content_type===category;
+        const matchesStatus=status==='all' || (status==='published' ? item.is_published : !item.is_published);
+        return matchesText && matchesCategory && matchesStatus;
+      });
+      const host=$('libraryList');
+      if (!filtered.length) { host.innerHTML='<div class="empty">No matching items. Adjust the search or filters, or upload new content.</div>'; return; }
+      host.innerHTML='<div class="tablewrap"><table><thead><tr><th>Content</th><th>Section</th><th>File details</th><th>Status</th><th>Actions</th></tr></thead><tbody>'+filtered.map(item=>{
+        const {data:publicData}=client.storage.from(BUCKET).getPublicUrl(item.file_path);
+        const url=publicData?.publicUrl || '#';
+        const fileDetail=escapeHtml(item.original_file_name || 'Uploaded file')+'<div class="meta">'+escapeHtml(formatFileSize(item.file_size))+' · Added '+escapeHtml(formatDate(item.created_at))+'</div>';
+        const albumLine=item.content_type==='music' && item.album ? '<div class="item-desc">Album: '+escapeHtml(item.album)+'</div>' : '';
+        return '<tr><td><div class="item-title">'+escapeHtml(item.title)+'</div><div class="item-desc">'+escapeHtml(item.creator || 'No author/source specified')+'</div>'+albumLine+'<div class="item-desc">'+escapeHtml(item.description || '')+'</div><div><a href="'+escapeHtml(url)+'" target="_blank" rel="noopener">Open file ↗</a></div></td><td>'+escapeHtml(labelFor(item.content_type))+'</td><td>'+fileDetail+'</td><td><span class="pill '+(item.is_published?'live':'draft')+'">'+(item.is_published?'Published':'Unpublished')+'</span></td><td><div class="actions" style="margin:0"><button class="btn secondary small" data-action="edit" data-id="'+escapeHtml(item.id)+'">Edit details</button><button class="btn secondary small" data-action="toggle" data-id="'+escapeHtml(item.id)+'">'+(item.is_published?'Unpublish':'Publish')+'</button><button class="btn danger small" data-action="delete" data-id="'+escapeHtml(item.id)+'">Delete</button></div></td></tr>';
+      }).join('')+'</tbody></table></div>';
+    }
+
+    $('filterInput').addEventListener('input',renderLibrary);
+    $('categoryFilter').addEventListener('change',renderLibrary);
+    $('statusFilter').addEventListener('change',renderLibrary);
+    $('refreshBtn').addEventListener('click',loadLibrary);
+
+    $('cancelEditBtn').addEventListener('click',()=>$('editDialog').close());
+    $('editForm').addEventListener('submit',async(event)=>{
+      event.preventDefault();
+      const id=$('editId').value;
+      const item=content.find(x=>x.id===id);
+      if(!item){setStatus('editStatus','This item is no longer in the current library. Refresh and try again.','error');return;}
+      const title=$('editTitle').value.trim();
+      if(!title){setStatus('editStatus','Please enter a title.','error');$('editTitle').focus();return;}
+      $('saveEditBtn').disabled=true; $('saveEditBtn').textContent='Saving…';
+      const changes={title,creator:$('editCreator').value.trim() || null,description:$('editDescription').value.trim() || null,updated_at:new Date().toISOString()};
+      const album=$('editAlbum').value.trim();
+      if (item.content_type==='music' && album && !albumColumnAvailable) { $('saveEditBtn').disabled=false; $('saveEditBtn').textContent='Save changes'; setStatus('editStatus','Album details require the ADD-ALBUM-METADATA.sql migration in Supabase SQL Editor.','error'); return; }
+      if (item.content_type==='music' && albumColumnAvailable) changes.album=album || null;
+      const {error}=await client.from('hub_content').update(changes).eq('id',id);
+      $('saveEditBtn').disabled=false; $('saveEditBtn').textContent='Save changes';
+      if(error){setStatus('editStatus','Could not save changes: '+error.message,'error');return;}
+      $('editDialog').close();
+      await loadLibrary();
+      setStatus('libraryStatus','Content details updated successfully.','success');
+    });
+    $('libraryList').addEventListener('click',async(event)=>{
+      const btn=event.target.closest('button[data-action]'); if(!btn) return;
+      const item=content.find(x=>x.id===btn.dataset.id); if(!item) return;
+      if(btn.dataset.action==='edit'){
+        $('editId').value=item.id;
+        $('editTitle').value=item.title || '';
+        $('editCreator').value=item.creator || '';
+        $('editAlbum').value=item.album || '';
+        $('editAlbumWrap').classList.toggle('hidden',item.content_type!=='music');
+        $('editDescription').value=item.description || '';
+        setStatus('editStatus','');
+        $('editDialog').showModal();
+        $('editTitle').focus();
+        return;
+      }
+      if(btn.dataset.action==='toggle'){ 
+        btn.disabled=true;
+        const {error}=await client.from('hub_content').update({is_published:!item.is_published,updated_at:new Date().toISOString()}).eq('id',item.id);
+        if(error) setStatus('libraryStatus','Could not update item: '+error.message,'error'); else await loadLibrary();
+        return;
+      }
+      if(btn.dataset.action==='delete'){
+        if(!confirm('Permanently delete “'+item.title+'” and its uploaded file(s)? This cannot be undone.')) return;
+        btn.disabled=true;
+        const paths=[item.file_path,item.cover_path].filter(Boolean);
+        const {error:storageError}=await client.storage.from(BUCKET).remove(paths);
+        if(storageError){btn.disabled=false;setStatus('libraryStatus','Could not delete stored file(s): '+storageError.message,'error');return;}
+        const {error}=await client.from('hub_content').delete().eq('id',item.id);
+        if(error){setStatus('libraryStatus','Files were removed but the database record could not be deleted: '+error.message,'error');return;}
+        await loadLibrary();
+      }
+    });
+
+    const saved=loadConfig();
+    if(saved){$('projectUrl').value=saved.url || ''; $('publicKey').value=saved.key || ''; connect();}
+    $('contentType').dispatchEvent(new Event('change'));
+  })();
+  </script>
+</body>
+</html>

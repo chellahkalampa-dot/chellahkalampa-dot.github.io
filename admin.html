@@ -50,10 +50,26 @@
         <label for="email">Administrator email</label><input id="email" type="email" required autocomplete="username" placeholder="you@example.com">
         <label for="password">Password</label><input id="password" type="password" required autocomplete="current-password" placeholder="Your password">
         <div class="actions"><button class="btn primary" id="loginBtn" type="submit">Sign in</button></div>
+<p style="margin-top:12px;font-size:.88rem">
+  <a href="#" id="forgotPasswordLink">Forgot your password?</a>
+</p>
       </form>
       <div class="status" id="loginStatus" role="status" aria-live="polite"></div>
     </section>
-
+    <section class="card hidden" id="recoveryCard" style="margin-top:18px">
+      <h2>Reset administrator password</h2>
+      <p class="muted">Choose a new password for your Digital Hub administrator account.</p>
+      <form id="recoveryForm">
+        <label for="newPassword">New password</label>
+        <input id="newPassword" type="password" minlength="12" required autocomplete="new-password">
+        <label for="confirmNewPassword">Confirm new password</label>
+        <input id="confirmNewPassword" type="password" minlength="12" required autocomplete="new-password">
+        <div class="actions">
+          <button class="btn primary" id="updatePasswordBtn" type="submit">Update password</button>
+        </div>
+      </form>
+      <div class="status" id="recoveryStatus" role="status" aria-live="polite"></div>
+    </section>
     <section class="hidden" id="adminArea" style="margin-top:18px">
       <div class="notice success" id="welcomeNotice">You are signed in.</div>
       <div class="grid">
@@ -124,6 +140,7 @@
     let client = null;
     let content = [];
     let currentUser = null;
+    let recoveryMode = false;
     let albumColumnAvailable = false;
     let featuredColumnAvailable = false;
 
@@ -136,24 +153,52 @@
     function connect() {
       const config = loadConfig();
       if (!config || !config.url || !config.key) return false;
-      if (!window.supabase || !window.supabase.createClient) { setStatus('configStatus','Supabase library could not load. Check your internet connection and reload.','error'); return false; }
-      try { client = window.supabase.createClient(config.url, config.key); }
-      catch (err) { setStatus('configStatus','Could not connect: '+err.message,'error'); return false; }
+      if (!window.supabase || !window.supabase.createClient) {
+        setStatus('configStatus','Supabase library could not load. Check your internet connection and reload.','error');
+        return false;
+      }
+
+      try {
+        client = window.supabase.createClient(config.url, config.key);
+      } catch (err) {
+        setStatus('configStatus','Could not connect: '+err.message,'error');
+        return false;
+      }
+
       $('loginCard').classList.remove('hidden');
       setStatus('configStatus','Project connection saved in this browser. Sign in below.','success');
-      client.auth.getSession().then(({data,error}) => {
-        if (error) { setStatus('loginStatus',error.message,'error'); return; }
-        if (data.session) verifyAdmin(data.session.user);
-      });
+
       client.auth.onAuthStateChange((event) => {
-        if (event === 'SIGNED_OUT') showLoggedOut();
+        if (event === 'SIGNED_OUT') {
+          recoveryMode = false;
+          $('recoveryCard').classList.add('hidden');
+          showLoggedOut();
+        }
+
+        if (event === 'PASSWORD_RECOVERY') {
+          recoveryMode = true;
+          $('loginCard').classList.add('hidden');
+          $('adminArea').classList.add('hidden');
+          $('recoveryCard').classList.remove('hidden');
+          setStatus('recoveryStatus', 'Enter and confirm your new password.');
+        }
       });
+
+      client.auth.getSession().then(({data,error}) => {
+        if (error) {
+          setStatus('loginStatus',error.message,'error');
+          return;
+        }
+        if (data.session && !recoveryMode) verifyAdmin(data.session.user);
+      });
+
       return true;
     }
 
     function showLoggedOut() {
-      currentUser=null;
-      $('adminArea').classList.add('hidden'); $('signoutBtn').classList.add('hidden');
+      currentUser = null;
+      $('adminArea').classList.add('hidden');
+      $('signoutBtn').classList.add('hidden');
       $('loginCard').classList.remove('hidden');
     }
 
@@ -206,7 +251,83 @@
     });
 
     $('signoutBtn').addEventListener('click', async () => { if (client) await client.auth.signOut(); showLoggedOut(); });
+    $('forgotPasswordLink').addEventListener('click', async (event) => {
+      event.preventDefault();
 
+      if (!client) {
+        setStatus('loginStatus', 'Connect your Supabase project first.', 'error');
+        return;
+      }
+
+      const email = $('email').value.trim();
+
+      if (!email) {
+        setStatus('loginStatus', 'Enter your administrator email address first.', 'error');
+        $('email').focus();
+        return;
+      }
+
+      setStatus('loginStatus', 'Sending password recovery email…');
+
+      const redirectTo = 'https://chellahkalampa-dot.github.io/admin.html';
+
+      const { error } = await client.auth.resetPasswordForEmail(email, {
+        redirectTo
+      });
+
+      if (error) {
+        setStatus('loginStatus', 'Recovery email failed: ' + error.message, 'error');
+        return;
+      }
+
+      setStatus('loginStatus', 'If the account is eligible, a password recovery email has been sent. Check your inbox and spam folder.', 'success');
+    });
+
+    $('recoveryForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      if (!client || !recoveryMode) {
+        setStatus('recoveryStatus', 'Open the password recovery link from your email first.', 'error');
+        return;
+      }
+
+      const password = $('newPassword').value;
+      const confirmation = $('confirmNewPassword').value;
+
+      if (password.length < 12) {
+        setStatus('recoveryStatus', 'Your new password must contain at least 12 characters.', 'error');
+        return;
+      }
+
+      if (password !== confirmation) {
+        setStatus('recoveryStatus', 'The two passwords do not match.', 'error');
+        return;
+      }
+
+      $('updatePasswordBtn').disabled = true;
+      $('updatePasswordBtn').textContent = 'Updating…';
+      setStatus('recoveryStatus', 'Updating your password…');
+
+      try {
+        const { error } = await client.auth.updateUser({ password });
+
+        if (error) throw error;
+
+        recoveryMode = false;
+        $('recoveryForm').reset();
+        $('recoveryCard').classList.add('hidden');
+        $('loginCard').classList.remove('hidden');
+
+        setStatus('loginStatus', 'Password updated successfully. You can now sign in using your new password.', 'success');
+
+        await client.auth.signOut();
+      } catch (error) {
+        setStatus('recoveryStatus', 'Password update failed: ' + error.message, 'error');
+      } finally {
+        $('updatePasswordBtn').disabled = false;
+        $('updatePasswordBtn').textContent = 'Update password';
+      }
+    });
     async function checkMusicColumns() {
       if (!client) return;
       const [albumCheck, featuredCheck] = await Promise.all([

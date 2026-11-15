@@ -1,4 +1,3 @@
-
 /* Digital Hub Stage 16.3 — Visitor and download analytics */
 (() => {
   'use strict';
@@ -34,12 +33,11 @@
 
   function getPageKey() {
     const page = document.body.dataset.page || 'home';
-
     return page === 'resource' ? 'resources' : page;
   }
 
   function initialise(client) {
-    if (!client || typeof client.rpc !== 'function') return;
+    if (!client || !client.supabaseUrl || !client.supabaseKey) return;
 
     const visitorId = getOrCreateId(
       window.localStorage,
@@ -65,28 +63,49 @@
 
     if (!allowedPages.includes(pageKey)) return;
 
+    const endpoint =
+      client.supabaseUrl.replace(/\/+$/, '') +
+      '/rest/v1/rpc/record_hub_analytics_event';
+
+    const apiKey = client.supabaseKey;
+
     function recordEvent(eventType, contentId = null) {
-      try {
-        client.rpc('record_hub_analytics_event', {
-          p_visitor_id: visitorId,
-          p_session_id: sessionId,
-          p_event_type: eventType,
-          p_page_key: pageKey,
-          p_content_id: contentId,
-          p_duration_seconds: null
-        }).then(result => {
-          if (result?.error) {
+      const payload = {
+        p_visitor_id: visitorId,
+        p_session_id: sessionId,
+        p_event_type: eventType,
+        p_page_key: pageKey,
+        p_content_id: contentId,
+        p_duration_seconds: null
+      };
+
+      fetch(endpoint, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'apikey': apiKey,
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      })
+        .then(async response => {
+          const result = await response.text();
+
+          if (!response.ok || result !== 'true') {
             console.warn(
               'Digital Hub analytics unavailable:',
-              result.error.message
+              response.status,
+              result
             );
           }
-        }).catch(() => {
-          // Analytics failures must not interrupt the website.
+        })
+        .catch(error => {
+          console.warn(
+            'Digital Hub analytics network error:',
+            error
+          );
         });
-      } catch (error) {
-        // Analytics failures must not interrupt the website.
-      }
     }
 
     // Record the current page visit.

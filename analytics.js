@@ -1,5 +1,5 @@
 
-/* Digital Hub Stage 16.2 — Anonymous visitor analytics */
+/* Digital Hub Stage 16.3 — Visitor and download analytics */
 (() => {
   'use strict';
 
@@ -65,19 +65,49 @@
 
     if (!allowedPages.includes(pageKey)) return;
 
-    client.rpc('record_hub_analytics_event', {
-      p_visitor_id: visitorId,
-      p_session_id: sessionId,
-      p_event_type: 'page_view',
-      p_page_key: pageKey,
-      p_content_id: null,
-      p_duration_seconds: null
-    }).then(({ error }) => {
-      if (error) {
-        console.warn('Digital Hub analytics unavailable:', error.message);
+    function recordEvent(eventType, contentId = null) {
+      try {
+        client.rpc('record_hub_analytics_event', {
+          p_visitor_id: visitorId,
+          p_session_id: sessionId,
+          p_event_type: eventType,
+          p_page_key: pageKey,
+          p_content_id: contentId,
+          p_duration_seconds: null
+        }).then(result => {
+          if (result?.error) {
+            console.warn(
+              'Digital Hub analytics unavailable:',
+              result.error.message
+            );
+          }
+        }).catch(() => {
+          // Analytics failures must not interrupt the website.
+        });
+      } catch (error) {
+        // Analytics failures must not interrupt the website.
       }
-    }).catch(() => {
-      // Analytics failures must not interrupt the website.
+    }
+
+    // Record the current page visit.
+    recordEvent('page_view');
+
+    // Track actual download-link clicks without blocking downloads.
+    document.addEventListener('click', event => {
+      const target = event.target;
+
+      if (!(target instanceof Element)) return;
+
+      const link = target.closest('a[data-download]');
+
+      if (!link) return;
+
+      const contentId = (link.dataset.download || '').trim();
+      const downloadUrl = (link.getAttribute('href') || '').trim();
+
+      if (!contentId || !downloadUrl) return;
+
+      recordEvent('download_click', contentId);
     });
   }
 

@@ -39,6 +39,9 @@
   if(!window.supabase||!window.supabase.createClient){showGlobalError('The content service did not load. Check your internet connection and refresh.');return;}
   if(!/^https:\/\/[a-zA-Z0-9-]+\.supabase\.co$/.test(SUPABASE_URL)||!(SUPABASE_PUBLISHABLE_KEY.startsWith('sb_publishable_')||SUPABASE_PUBLISHABLE_KEY.startsWith('eyJ'))){showGlobalError('The public catalogue connection needs to be checked by the site owner.');return;}
   const hubClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
+    if(window.DigitalHubAnalytics){
+    window.DigitalHubAnalytics.initialise(hubClient);
+  }
   let allItems=[];
   let musicQueue=[];
   let activeQueue=[];
